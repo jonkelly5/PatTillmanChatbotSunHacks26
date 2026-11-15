@@ -59,6 +59,6 @@ patTillmanChatApp/
 ## Additional Notes
 This is an educational app, so prioritize simple code and moving fast over production-level security and maintainability.
 
-Deploy to AWS account 115512263232 in us-west-2.
+Deploy to AWS account {AWS-Account-id} in us-west-2.
 
 If any instructions are unclear, stop and ask for clarification before proceeding.
