@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask About Pat Tillman</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #f5f0f2; margin: 0; color: #222; }
+  header { background: #8c1d40; color: #ffc627; padding: 1.2rem; text-align: center; }
+  main { max-width: 760px; margin: 1.5rem auto; padding: 0 1rem; }
+  form { display: flex; gap: .5rem; }
+  input { flex: 1; padding: .7rem; font-size: 1rem; border: 1px solid #aaa; border-radius: 6px; }
+  button { padding: .7rem 1.2rem; font-size: 1rem; background: #8c1d40; color: #fff; border: 0; border-radius: 6px; cursor: pointer; }
+  button:disabled { opacity: .6; cursor: default; }
+  .entry { background: #fff; border-radius: 8px; padding: 1rem; margin-top: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+  .q { font-weight: 600; margin-bottom: .5rem; }
+  .a p { margin: .5rem 0; }
+  .a ul, .a ol { padding-left: 1.5rem; }
+  .a pre { overflow-x: auto; background: #f0f0f0; padding: .6rem; border-radius: 4px; }
+  .a.error { color: #b00020; }
+  .a.pending { color: #666; font-style: italic; }
+</style>
+</head>
+<body>
+<header><h1>Ask About Pat Tillman</h1></header>
+<main>
+  <form id="form">
+    <input id="q" type="text" placeholder="Ask a question about Pat Tillman..." autocomplete="off" required>
+    <button id="btn" type="submit">Ask</button>
+  </form>
+  <div id="history"></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<script>
+  const form = document.getElementById('form');
+  const input = document.getElementById('q');
+  const btn = document.getElementById('btn');
+  const history = document.getElementById('history');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const question = input.value.trim();
+    if (!question) return;
+    input.value = '';
+    btn.disabled = true;
+
+    const entry = document.createElement('div');
+    entry.className = 'entry';
+    const qEl = document.createElement('div');
+    qEl.className = 'q';
+    qEl.textContent = question;
+    const aEl = document.createElement('div');
+    aEl.className = 'a pending';
+    aEl.textContent = 'Thinking...';
+    entry.append(qEl, aEl);
+    history.prepend(entry);
+
+    try {
+      const res = await fetch('/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || typeof data.answer !== 'string') throw new Error(data.error || 'Request failed (' + res.status + ')');
+      aEl.className = 'a';
+      aEl.innerHTML = DOMPurify.sanitize(marked.parse(data.answer));
+    } catch (err) {
+      aEl.className = 'a error';
+      aEl.textContent = 'Error: ' + err.message;
+    } finally {
+      btn.disabled = false;
+      input.focus();
+    }
+  });
+</script>
+</body>
+</html>
