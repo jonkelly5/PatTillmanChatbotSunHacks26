@@ -1,6 +1,6 @@
 # Website link
 
-dxgtsdlm6avj2.cloudfront.net (Active until Nov 21st 2026)
+https://dxgtsdlm6avj2.cloudfront.net (Active until Nov 21st 2026)
 
 # Getting started
 
