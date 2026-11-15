@@ -3,5 +3,5 @@ import { PatTillmanChatStack } from '../lib/patTillmanChat-stack';
 
 const app = new cdk.App();
 new PatTillmanChatStack(app, 'PatTillmanChatStack', {
-  env: { account: '115512263232', region: 'us-west-2' },
+  env: { account: '{AWS-Account-id}', region: 'us-west-2' },
 });
